@@ -59,6 +59,20 @@ Route::resource('categories', App\Http\Controllers\CategoriesController::class);
 
 */
 
+//-----------------------------------------------------------------------------------------------
+//                  Delete specific record using from an iteration : Modal + JS code + Laravel   
+//-----------------------------------------------------------------------------------------------
+/*
+
+- I tried to solve this specific problem myself before one months, and I didn't do it cuz i was lazy
+    .. now, this dude did it for me using a very clean code!!
+
+- Go to categories/index.blade.php 
+
+*/
+
+  
+
 
 
 
