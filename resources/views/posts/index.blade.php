@@ -3,39 +3,51 @@
 
 @section('content')
     <div class="d-flex justify-content-end mb-2">
-        <a href="{{route('categories.create')}}" class="btn btn-success">Add Category</a>
+        <a href="{{route('posts.create')}}" class="btn btn-success">Add Post</a>
     </div>
     <div class="card card-default">
-        <div class="card-header">Categories</div>
+        <div class="card-header">Posts</div>
         <div class="card-body">
             @include('inc.messages')
             
-            @if ($categories->count()>0)
+            @if ($posts->count()>0)
                 <table class="table">
                     <thead>
-                        <th>Name</th>
+                        <th>Image</th>
+                        <th>Title</th>
                         <th></th>
                     </thead>
                     <tbody>
-                        @foreach ($categories as $category)
+                        @foreach ($posts as $post)
                             <tr>
                                 <td>
-                                    {{$category->name}}
+                                    <img src="{{asset('/storage/'.$post->image)}}" width='80px'    alt="">
                                 </td>
                                 <td>
-                                    <a href="{{route('categories.edit', $category->id)}}" class="btn btn-info btn-sm">Edit</a>
+                                    {{$post->title}}
+                                </td>
+                                <td>
+                                    @if (!$post->trashed())
+                                        <a href="{{route('posts.edit', $post->id)}}" class="btn btn-info btn-sm">Edit</a>
+                                    @endif
     <!-- ================================================================================================================= -->
     <!--                Delete specific record using from an iteration : Modal + JS code + Laravel                         -->
     <!-- ================================================================================================================== -->
-    <button class="btn btn-danger btn-sm" onclick="handleDelete({{$category->id}})">Delete</button>
+
+    <!--//---------------------------------------------------------------------------- -->
+    <!--//                          Soft Delete + Trashed Posts                        -->
+    <!--//---------------------------------------------------------------------------- -->
+                                    <button class="btn btn-danger btn-sm" onclick="handleDelete({{$post->id}})">
+                                        {{$post->trashed() ? 'Delete' : 'Trash'}}
+                                    </button>
                                 </td>
                                 
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
-            @else
-                <h3 class="text-center">No Categories Yet</h3>
+            @else  
+                <h3 class="text-center">No Posts Yet</h3>
             @endif
         </div>
     </div>
@@ -44,17 +56,17 @@
     <!-- modals -->
     <div class="modal fade" id="deleteModal" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true" tabindex="-1">
         <div class="modal-dialog">
-        <form action="" method="POST" id="deleteCategoryForm">
+        <form action="" method="POST" id="deletePostForm">
             @csrf
             @method('DELETE')
 
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Delete Category</h5>
+                    <h5 class="modal-title">Delete Post</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Are you sure you want to delete this category?</p>
+                    <p>Are you sure you want to delete this post?</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -69,8 +81,8 @@
 @section('script')
     <script>
         function handleDelete(id){
-            var form = document.getElementById('deleteCategoryForm');
-            form.action = '/categories/' + id;
+            var form = document.getElementById('deletePostForm');
+            form.action = '/posts/' + id;
             $('#deleteModal').modal('show');
         }
     </script>

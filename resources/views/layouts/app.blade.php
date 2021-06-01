@@ -19,6 +19,8 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
+    @yield('css')
 </head>
 <body>
     <div id="app">
@@ -90,6 +92,13 @@
                                     <a href="{{route('categories.index')}}">Categories</a>
                                 </li>
                             </ul>
+
+                            <ul class="list-group mt-5">
+                                <li class="list-group-item">
+                                    <a href="/trashed-posts">Trashed Posts</a>
+                                </li>
+                                
+                            </ul>
                         </div>
                         <!-- end of sidebar -->
                         <div class="col-md-8">
@@ -106,7 +115,7 @@
         @endauth
         
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"  crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"  crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"  crossorigin="anonymous"></script>
     
