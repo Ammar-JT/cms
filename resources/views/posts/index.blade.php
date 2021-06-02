@@ -15,6 +15,8 @@
                     <thead>
                         <th>Image</th>
                         <th>Title</th>
+                        <th>Category</th>
+
                         <th></th>
                     </thead>
                     <tbody>
@@ -27,7 +29,17 @@
                                     {{$post->title}}
                                 </td>
                                 <td>
-                                    @if (!$post->trashed())
+                                    <a href="{{route('categories.show', $post->category->id)}}">{{$post->category->name}}</a>
+                                    
+                                </td>
+                                <td>
+                                    @if ($post->trashed())
+                                        <form action="{{route('trashed-posts.update', $post->id)}}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="btn btn-info btn-sm">Restore</button>
+                                        </form>
+                                    @else
                                         <a href="{{route('posts.edit', $post->id)}}" class="btn btn-info btn-sm">Edit</a>
                                     @endif
     <!-- ================================================================================================================= -->

@@ -4,12 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Models\Category;
+use App\Models\Tag;
+
 use App\Http\Requests\Posts\CreatePostRequest;
 
 
 
 class PostsController extends Controller
 {
+    public function __construct(){
+        $this->middleware('verifyCategoryCount')->only(['create','store']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -26,8 +32,8 @@ class PostsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-        return view('posts.create');
+    {   
+        return view('posts.create')->with('categories', Category::all())->with('tags', Tag::all());
     }
 
     /**
@@ -43,13 +49,26 @@ class PostsController extends Controller
         
 
         //create the post
-        Post::create([
+        $post = Post::create([
             'title' => $request->title,
             'description' => $request->description,
             'content' => $request->content,
             'image' => $image,
-            'published_at' => $request->published_at
+            'published_at' => $request->published_at,
+            'category_id' => $request->category
+
         ]);
+
+        //----------------------------------------------------------------------------
+        //                          Many to Many Relationship + attach() function
+        //----------------------------------------------------------------------------
+
+        //if post has tag, save it in the n to n table using attach
+        //.. notice you submit more thang one tag at once through the array "tags"
+        
+        if($request->tags){
+            $post->tags()->attach($request->tags);
+        }
 
         //redirect the user with the success message
         return redirect(route('posts.index'))->with('success', 'Post Created Successfully');
@@ -72,9 +91,9 @@ class PostsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Post $post)
     {
-        //
+        return view('posts.create')->with(['post' => $post, 'categories' => Category::all(), 'tags' => Tag::all()]);
     }
 
     /**
@@ -84,9 +103,41 @@ class PostsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        //for security, so the hacker coudn't mass assign any other things: 
+        $data = $request->only(['title','description','published_at','content', 'category_id']);
+
+        //check if new image
+        if($request->hasFile('image')){
+            //upload image
+            $image = $request->image->store('images/posts');
+
+
+            //delete old one (I did the deletion code in the Post model)
+            $post->deleteImage();
+            
+
+            //we add the image url to the array: 
+            $data['image'] = $image;
+        }
+
+        //----------------------------------------------------------------------------
+        //                          Many to Many Relationship + sync() function
+        //----------------------------------------------------------------------------
+
+
+        //here we use sync method to make sure if the new selected tag
+        //.. is tha same, if not it will be synced to the new one
+        if($request->tags){
+            $post->tags()->sync($request->tags);
+        }
+
+        //update attribues
+        $post->update($data);
+
+        //redirect with message
+        return redirect(route('posts.index'))->with('success', 'Post Updated Successfully');
     }
 
     /**
@@ -108,9 +159,8 @@ class PostsController extends Controller
         if($post->trashed()){
             $post->forceDelete();
 
-            $currentPath = getcwd();
-            //I used unlink instead of storage cuz storage won't work in hostgator!
-            unlink($currentPath .'/storage/'. $post->image);
+            //delete image (I did the deletion code in the Post model)
+            $post->deleteImage();
 
             $msg = 'Post Deleted Successfully';
         }else{
@@ -130,7 +180,8 @@ class PostsController extends Controller
 
     public function trashed(){
         //this method get all the posts including the trashed posts: 
-        $trashed = Post::withTrashed()->get();
+        //$trashed = Post::withTrashed()->get();
+        $trashed = Post::onlyTrashed()->get();
 
         //we will return the same view but with trashed
 
@@ -138,5 +189,19 @@ class PostsController extends Controller
         //same as
         //return view('posts.index')->withPosts( $trashed);
 
+    }
+
+    public function restore($id){
+        //get the post even if it's trashed:
+        $post = Post::withTrashed()->where('id', $id)->firstOrFail(); //firstOrFail for security, so if it doesn't exist it should show 404 page
+
+        $post->restore();
+
+        $trashed = Post::onlyTrashed()->get();
+
+        
+            
+        //Wow, a very convenient way to redirect to the same page
+        return redirect(route('trashed-posts.index'))->with('success','Post Restored Successfuly');
     }
 }

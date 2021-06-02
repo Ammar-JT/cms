@@ -10,13 +10,17 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
     <!-- Styles -->
+    <style>
+        a.btn-info{
+            color:white;
+        }
+    </style>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 
@@ -89,6 +93,9 @@
                                     <a href="/posts">Posts</a>
                                 </li>
                                 <li class="list-group-item">
+                                    <a href="{{route('tags.index')}}">Tags</a>
+                                </li>
+                                <li class="list-group-item">
                                     <a href="{{route('categories.index')}}">Categories</a>
                                 </li>
                             </ul>
@@ -115,10 +122,12 @@
         @endauth
         
     </div>
+    <script src="{{ asset('js/app.js') }}"></script>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"  crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"  crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js"  crossorigin="anonymous"></script>
-    
+
     @yield('script')
 </body>
 </html>

@@ -16,7 +16,7 @@
                 @endif
                 <div class="form-group">
                     <label for="title">Title</label>
-                    <input type="text" value="{{isset($post) ? $post->name : ''}}" name="title" id="title" class="form-control">
+                    <input type="text" value="{{isset($post) ? $post->title : ''}}" name="title" id="title" class="form-control">
                 </div>
                 <div class="form-group">
                     <label for="description">Description</label>
@@ -24,7 +24,7 @@
                 </div>
                 <div class="form-group">
                     <label for="content">Content</label>
-                    <input id="content" type="hidden" name="content">
+                    <input id="content" type="hidden" name="content" value="{{isset($post) ? $post->content : ''}}">
                     <trix-editor input="content"></trix-editor>
                 </div>
 
@@ -35,12 +35,59 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="category">Category</label>
+                    <select class="form-control" name="category" id="category">
+                        @foreach ($categories as $category)
+                            <option value="{{$category->id}}" 
+                                @if (isset($post))
+                                    {{($post->category_id == $category->id) ? 'selected' : ''}}
+                                @endif 
+                                >{{$category->name}}</option>
+                        @endforeach
+                        
+                    </select>
+                </div>
+
+                @if (isset($post))
+                    <div class="form-group">
+                        <img src="{{asset('/storage/'.$post->image)}}" class="w-100" alt="">
+                    </div>
+                @endif
+                
+
+                <div class="form-group">
                     <label for="image">Image</label>
                     <input type="file" name="image" id="image" class="form-control">
                 </div>
+                <div class="form-group">
+                    @if ($tags->count()>0)
+                        <label for="tags">Tags</label>
+                        <!-- Notice multiple select for MULTIPLE SELECT!!! 
+                             Also you must put tags[] in the name so html know you want to submit
+                             .. multiple options in an array
+
+                            
+                            -->
+                        <select name="tags[]" id="tags" class="form-control tags-selector" multiple>
+                            @foreach ($tags as $tag)
+                                <option value="{{$tag->id}}"
+                                    @if (isset($post))
+                                        @if($post->hasTag($tag->id))
+                                            selected
+                                        @endif
+                                    @endif
+                                    
+                                    >
+                                    {{$tag->name}}
+                                </option>
+                            @endforeach
+                        </select>
+                    @endif
+                    
+                </div>
 
                 <div class="form-group">
-                    <button class="btn btn-success">
+                    <button type='submit' class="btn btn-success">
                         {{isset($post) ? "Update Post" : "Add Post"}}
                     </button>
                 </div>
@@ -53,14 +100,22 @@
 @section('script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         flatpickr('#published_at', {
             enableTime: true
+        });
+
+        // jQuery:
+        $(document).ready(function() {
+            $('.tags-selector').select2();
         });
     </script>
 @endsection
 
 @section('css')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 @endsection

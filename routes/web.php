@@ -19,14 +19,19 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::resource('categories', App\Http\Controllers\CategoriesController::class);
-Route::resource('posts', App\Http\Controllers\PostsController::class);
+Route::middleware(['auth'])->group(function(){
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('/trashed-posts', [App\Http\Controllers\PostsController::class, 'trashed'])->name('trashed-post.index');
+    Route::resource('categories', App\Http\Controllers\CategoriesController::class);
+    Route::resource('posts', App\Http\Controllers\PostsController::class);
+    Route::resource('tags', App\Http\Controllers\TagsController::class);
 
-
+    
+    Route::get('/trashed-posts', [App\Http\Controllers\PostsController::class, 'trashed'])->name('trashed-posts.index');
+    
+    Route::put('/restore-posts/{post}', [App\Http\Controllers\PostsController::class, 'restore'])->name('trashed-posts.update');    
+});
 
 
 
@@ -119,6 +124,11 @@ Route::get('/trashed-posts', [App\Http\Controllers\PostsController::class, 'tras
 - To rollback the last migration:
         php artisan migrate:rollback
 
+- Later I add a pivot table for the many to many relationship between posts and tags:
+  .. and as you can see both are singular and I orderd them alphabatically
+  .. laravel is smart, writing it that way it will make the column for the n to n table for you: 
+        php artisan make:migration create_post_tag_table --table=post_tag
+
 */
 
 //----------------------------------------------------------------------------
@@ -136,8 +146,55 @@ Route::get('/trashed-posts', [App\Http\Controllers\PostsController::class, 'tras
   and in the class
     use SoftDeletes;
 
-
 */
+
+//----------------------------------------------------------------------------
+//                          MiddleWare
+//----------------------------------------------------------------------------
+/*
+
+- To make a middleware: 
+    1-    php artisan make:middleware verifyCategorisCount
+    2- write down your logic in the middleware
+    3- register the middleware in kernel
+    4- use the middleware in the route or in the consructor like any other middleware
+-
+*/
+
+
+//----------------------------------------------------------------------------
+//                          Route Group
+//----------------------------------------------------------------------------
+/*
+
+- Instead of putting the middleware in every route, you can put it in a group of routes: 
+    Route::middleware(['auth'])->group(function(){ ---- your authed routes ----});
+*/
+
+
+//----------------------------------------------------------------------------
+//                          Many to Many Relationship + attach() + sync()
+//----------------------------------------------------------------------------
+/*
+
+-  I add a pivot table for the many to many relationship between posts and tags:
+  .. and as you can see both are singular and I orderd them alphabatically
+  .. laravel is smart, writing it that way it will make the column for the n to n table for you: 
+        php artisan make:migration create_post_tag_table --table=post_tag
+- I fill up the migration table
+- I put belongsToMany() in both the post and the tag models
+- migrate
+
+- use attach() function in PostsController@create
+
+- use sync() function in PostsController@update
+
+- use this library for a beautiful selector: 
+    https://select2.org/tagging
+*/
+
+
+
 
 
 
