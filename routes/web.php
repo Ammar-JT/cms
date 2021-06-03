@@ -13,9 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
+
 
 Auth::routes();
 
@@ -31,6 +30,22 @@ Route::middleware(['auth'])->group(function(){
     Route::get('/trashed-posts', [App\Http\Controllers\PostsController::class, 'trashed'])->name('trashed-posts.index');
     
     Route::put('/restore-posts/{post}', [App\Http\Controllers\PostsController::class, 'restore'])->name('trashed-posts.update');    
+
+
+});
+
+Route::middleware(['auth','isAdmin'])->group(function(){
+    Route::get('/users', [App\Http\Controllers\UsersController::class, 'index'])->name('users.index');
+
+    //if you put '/users/{id}' instead of '{user}' laravel will recive it as ID literally,
+    //.. so, in the controller you won't be able to use makeAdmin(User $user){}.. 
+    //.. cuz laravel will make a new user instead of finding the user u ask for!!
+    Route::post('/users/{user}/make-admin', [App\Http\Controllers\UsersController::class, 'makeAdmin'])->name('users.make-admin');
+    Route::post('/users/{user}/make-writer', [App\Http\Controllers\UsersController::class, 'makeWriter'])->name('users.make-writer');
+
+    Route::get('/users/profile', [App\Http\Controllers\UsersController::class, 'editProfile'])->name('users.edit-profile');
+    Route::put('/users/profile', [App\Http\Controllers\UsersController::class, 'updateProfile'])->name('users.update-profile');
+
 });
 
 
@@ -64,7 +79,12 @@ Route::middleware(['auth'])->group(function(){
 -Instead of validating the values in the old way, you make a request object that has all the validation details there
 -look at CategoriesController@store 
 -To make request object:
-        php artisan make:request CreateCategoryRequest
+        php artisan make:request Categories/CreateCategoryRequest
+        php artisan make:request Categories/UpdateCategoryRequest
+
+- I made also: 
+        php artisan make:request Users/UpdateProfileRequest
+
 
 */
 
@@ -192,6 +212,87 @@ Route::middleware(['auth'])->group(function(){
 - use this library for a beautiful selector: 
     https://select2.org/tagging
 */
+
+
+
+
+
+
+//----------------------------------------------
+//                  Seeders
+//----------------------------------------------
+/*
+- If you want to know a detailed explaination about seeds and factories go to todos project: 
+        https://github.com/Ammar-JT/Todos
+
+- To make a seeder: 
+        php artisan make:seeder UsersTableSeeder
+
+- Fill up the seed with the records you want, you can use seeder to make a specific record (like admin),
+  .. or you can use a seeder with a factory to make a massive number of records.
+  .. If you want to know about factories go to the todos proejct.
+
+- After making the seeder, make sure you add this seeder in DatabaseSeeder.php in the run function:
+        $this->call(UsersTableSeeder::class);
+
+---------------------------------------
+    Migration: refresh + seed!!!!! 
+--------------------------------------
+- If you want to refresh the database (delete all tables and migration the new tables) use: 
+        php artisan migrate:refresh
+
+- If you want to seed the db with the seeders you made: 
+        php artisan db:seed
+
+- If you want both: refresh + seed: 
+        php artisan migrate:refresh --seed
+        
+
+*/
+
+
+//----------------------------------------------
+//                  Roles (without an external library)
+//----------------------------------------------
+/*
+
+1- Put a role record in the users table, and make it not admin by default (writer for example)
+2- Put a seeder that make an admin account, so website db will had an admin account when you refresh --seed
+3- Make an isAdmin() function in the User's model to check for admin in blade or controllers
+4- For security you better make verifyIsAdmin() function as a middleware, 
+   ..so you can use it in the routes and construct, with this code: 
+        php artisan make:middleware verifyIsAdmin
+5- Don't forget to register this middleware in the kernel
+6- Better to use route group so you can use this middleware for many routes at once
+
+7- Now, with isAdmin(in model) + verifyIsAdmin(as middleware for routes): 
+    - non admin users can't see the buttons using isAdmin() in the views
+    - non admin users can't inter the routes at all using verifyIsAdmin()
+    - So, it means a clean views + Secure App
+    
+*/
+
+//----------------------------------------------
+//                  Some useful front-end libraries
+//----------------------------------------------
+/*
+- Laravel Gravatar: for the user avatar: 
+    https://github.com/thomaswelton/laravel-gravatar
+
+- Trix: a simple text editor for <input>: 
+    https://github.com/basecamp/trix
+
+- Flatpicker: for very beautiful time and date picker: 
+    https://flatpickr.js.org/getting-started/
+
+- Select2: for many things, but I use the tool for tag selecting (like when you select email in gmail):
+    https://select2.org/tagging
+
+
+    
+*/
+
+
 
 
 

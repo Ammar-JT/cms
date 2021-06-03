@@ -139,6 +139,7 @@ return [
         /*
          * Laravel Framework Service Providers...
          */
+        //Thomaswelton\LaravelGravatar\LaravelGravatarServiceProvider::class, //donno why, but no need to make it works
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,
         Illuminate\Bus\BusServiceProvider::class,
@@ -189,7 +190,7 @@ return [
     */
 
     'aliases' => [
-
+        'Gravatar' => Thomaswelton\LaravelGravatar\Facades\Gravatar::class,
         'App' => Illuminate\Support\Facades\App::class,
         'Arr' => Illuminate\Support\Arr::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,

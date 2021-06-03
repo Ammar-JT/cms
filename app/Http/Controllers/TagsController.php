@@ -110,6 +110,9 @@ class TagsController extends Controller
      */
     public function destroy(Tag $tag)
     {
+        if($tag->posts->count() > 0){
+            return redirect()->back()->with('error', 'Category cannot be deleted because it has some posts');
+        }
         $tag->delete();
 
         return redirect(route('tags.index'))->with('success', 'Tag Deleted Successfully');
