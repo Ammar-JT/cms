@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
+Route::get('/blog/posts/{post}', [App\Http\Controllers\Blog\PostsController::class, 'show'])->name('blog.show');
+Route::get('/blog/categories/{category}', [App\Http\Controllers\Blog\PostsController::class, 'show'])->name('blog.category');
+Route::get('/blog/tags/{tag}', [App\Http\Controllers\Blog\PostsController::class, 'show'])->name('blog.tag');
 
 
 Auth::routes();
@@ -287,6 +290,9 @@ Route::middleware(['auth','isAdmin'])->group(function(){
 
 - Select2: for many things, but I use the tool for tag selecting (like when you select email in gmail):
     https://select2.org/tagging
+
+- Comment section (now thier server has some issues, it so slow that i couldn't set the comment section up!): 
+    https://disqus.com/
 
 
     

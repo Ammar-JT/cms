@@ -3,9 +3,13 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+
 use App\Models\Tag;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\User;
+
 
 class PostsTableSeeder extends Seeder
 {
@@ -26,26 +30,38 @@ class PostsTableSeeder extends Seeder
             'name' => 'Partnership'
         ]);
 
+        $author1 = User::create([
+            'name' => 'John Doe',
+            'email' => 'john@doe.com',
+            'password' => Hash::make('password')
+        ]);
+        $author2 = User::create([
+            'name' => 'Jane Doe',
+            'email' => 'jane@doe.com',
+            'password' => Hash::make('password')
+        ]);
+
         $post1 = Post::create([
             'title' => 'We relocated our office to a new designed garage',
             'description' => "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
             'content' => "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
             'category_id' => $category1->id,
-            'image' => 'images/posts/1.jpg'
+            'image' => 'images/posts/1.jpg',
+            'user_id' => $author1->id
 
         ]);
-
-        $post2 = Post::create([
+        
+        //notice we use the models(tables) relationship to create a post without needing to pass 'user_id'!!
+        $post2 = $author1->posts()->create([
             'title' => 'Top 5 Brilliant content marketing strategis',
             'description' => "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
             'content' => "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
             'category_id' => $category2->id,
             'image' => 'images/posts/2.jpg'
 
-
         ]);
 
-        $post3 = Post::create([
+        $post3 = $author2->posts()->create([
             'title' => 'Best practise for mininmalist design with example',
             'description' => "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
             'content' => "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
@@ -55,7 +71,7 @@ class PostsTableSeeder extends Seeder
 
         ]);
 
-        $post4 = Post::create([
+        $post4 = $author2->posts()->create([
             'title' => 'Congratulate and thank to Maryam for joining our team',
             'description' => "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
             'content' => "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",

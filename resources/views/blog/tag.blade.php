@@ -1,7 +1,7 @@
 @extends('layouts.blog')
 
 @section('title')
-Saas Blog
+Tag {{ $tag->name }}
 @endsection
 
 @section('header')
@@ -12,7 +12,7 @@ Saas Blog
     <div class="row">
       <div class="col-md-8 mx-auto">
 
-        <h1>Latest Blog Posts</h1>
+        <h1>{{ $tag->name }}</h1>
         <p class="lead-2 opacity-90 mt-6">Read and get updated on how we progress</p>
 
       </div>
@@ -32,11 +32,11 @@ Saas Blog
 
         <div class="col-md-8 col-xl-9">
           <div class="row gap-y">
-            <!-- foresle = if(isset) + foreach($posts as post) -->
+
             @forelse($posts as $post)
                 <div class="col-md-6">
                   <div class="card border hover-shadow-6 mb-6 d-block">
-                    <a href="{{route('blog.show', $post->id)}}"><img class="card-img-top" src="{{ asset('/storage/'.$post->image) }}" alt="Card image cap"></a>
+                    <a href="{{ route('blog.show', $post->id) }}"><img class="card-img-top" src="{{ asset($post->image) }}" alt="Card image cap"></a>
                     <div class="p-6 text-center">
                       <p>
                         <a class="small-5 text-lighter text-uppercase ls-2 fw-400" href="#">
@@ -52,13 +52,14 @@ Saas Blog
                   </div>
                 </div>
             @empty
-              
+              <p class="text-center">
+                No results found for query <strong>{{ request()->query('search') }}</strong>
+              </p>
             @endforelse
-            
 
           </div>
-          {{$posts->links()}}
-          
+
+          {{ $posts->appends(['search' => request()->query('search') ])->links() }}
         </div>
 
 
