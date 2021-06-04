@@ -19,6 +19,8 @@ class PostsController extends Controller
 
     public function category(Category $category)
     {
+
+      
       return view('blog.category')
         ->with('category', $category)
         ->with('posts', $category->posts()->searched()->simplePaginate(3))
@@ -28,6 +30,7 @@ class PostsController extends Controller
 
     public function tag(Tag $tag)
     {
+
       return view('blog.tag')
         ->with('tag', $tag)
         ->with('categories', Category::all())

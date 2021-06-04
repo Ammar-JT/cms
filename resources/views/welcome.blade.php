@@ -1,7 +1,7 @@
 @extends('layouts.blog')
 
 @section('title')
-Saas Blog
+CMS
 @endsection
 
 @section('header')
@@ -52,12 +52,15 @@ Saas Blog
                   </div>
                 </div>
             @empty
-              
+              <p class="text-center">
+                No result for query <strong>{{request()->query('search')}}</strong>
+              </p>
             @endforelse
             
 
           </div>
-          {{$posts->links()}}
+          <!-- you have to use append to append the search get query, in case you paginate with a search -->
+          {{$posts->appends(['search' => request()->query('search')])->links()}}
           
         </div>
 

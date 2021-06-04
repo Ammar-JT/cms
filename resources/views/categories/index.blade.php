@@ -33,7 +33,7 @@
     <!-- ================================================================================================================= -->
     <!--                Delete specific record using from an iteration : Modal + JS code + Laravel                         -->
     <!-- ================================================================================================================== -->
-    <button class="btn btn-danger btn-sm" onclick="handleDelete({{$category->id}})">Delete</button>
+                                    <button class="btn btn-danger btn-sm" onclick="handleDelete({{$category->id}})">Delete</button>
                                 </td>
                                 
                             </tr>

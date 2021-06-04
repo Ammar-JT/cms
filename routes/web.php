@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
 Route::get('/blog/posts/{post}', [App\Http\Controllers\Blog\PostsController::class, 'show'])->name('blog.show');
-Route::get('/blog/categories/{category}', [App\Http\Controllers\Blog\PostsController::class, 'show'])->name('blog.category');
-Route::get('/blog/tags/{tag}', [App\Http\Controllers\Blog\PostsController::class, 'show'])->name('blog.tag');
+Route::get('/blog/categories/{category}', [App\Http\Controllers\Blog\PostsController::class, 'category'])->name('blog.category');
+Route::get('/blog/tags/{tag}', [App\Http\Controllers\Blog\PostsController::class, 'tag'])->name('blog.tag');
 
 
 Auth::routes();
@@ -275,6 +275,85 @@ Route::middleware(['auth','isAdmin'])->group(function(){
     
 */
 
+//---------------------------------------------------------------------------------------------
+//           publish some vendor files (which means we can customize a tag or a provider in laravel)
+//           + Custom the bootstrap paginator
+//---------------------------------------------------------------------------------------------
+/*
+- To publish a vendor file: 
+    php artisan vendor:publish
+- After that it will give you list of the customizable providers and tags
+  .. to be published to your resource file
+- Choose the pagination tag
+
+- To use the bootstrap paginator you have to go to
+        app\Providers\AppServiceProvider.php
+  and change add this to the file: 
+        use Illuminate\Pagination\Paginator;
+        Paginator::useBootstrap(); //in the boot() function
+
+- Now go to: 
+        resource/views/vendor/simple-bootstrap-4.blade.php 
+  And customize the template to what you want
+
+*/
+
+
+//---------------------------------------------------------------------------------------------
+//                              Search function in Laravel
+//---------------------------------------------------------------------------------------------
+/*
+- Make a form for search using get or post http request, like the one in: sidebar.blade.php 
+
+- After receiving the query, use  'LIKE', parameter to search in db, see: WelcomeController
+
+*/
+
+
+//---------------------------------------------------------------------------------------------
+//                              Query Local Scopes
+//---------------------------------------------------------------------------------------------
+/*
+- Local scopes allow you to define common sets of sql query constraints that
+  .. you may easily re-use throughout your application.
+- For example, you may need to frequently retrieve all posts you searched for (in welcome + categories + tags).
+  .. To define a scope, prefix an Eloquent model (like Post model) method with scope (see the model Post, scopeSearched()).
+
+- So, you can use these just like the functions you make in models.. but this one specialized for sql queries.
+
+- Look at the Post model + WelcomeController + blog/controllers
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //----------------------------------------------
 //                  Some useful front-end libraries
 //----------------------------------------------
@@ -295,7 +374,11 @@ Route::middleware(['auth','isAdmin'])->group(function(){
     https://disqus.com/
 
 
-    
+- AddThis tool: for sharing buttons, needs to sign up for analatical tools, 
+    https://www.addthis.com/
+  But you can still use it without signing (look at layouts/blog.blade.php);
+
+
 */
 
 
