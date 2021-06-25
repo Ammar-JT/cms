@@ -30,6 +30,6 @@ class WelcomeController extends Controller
       return view('welcome')
         ->with('categories', Category::all())
         ->with('tags', Tag::all())
-        ->with('posts', Post::searched()->simplePaginate(3)); //searched() is a local scope query, look at the model Post
+        ->with('posts', Post::searched()->simplePaginate(4)); //searched() is a local scope query, look at the model Post
     }
 }

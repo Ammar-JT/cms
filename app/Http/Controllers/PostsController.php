@@ -23,7 +23,12 @@ class PostsController extends Controller
      */
     public function index()
     {
-        return view('posts.index')->with('posts', Post::all());
+        if(auth()->user()->isAdmin()){
+            $posts = Post::all();
+        }else{
+            $posts = auth()->user()->posts;
+        }
+        return view('posts.index')->with('posts', $posts);
     }
 
     /**
@@ -32,7 +37,7 @@ class PostsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {   
+    {
         return view('posts.create')->with('categories', Category::all())->with('tags', Tag::all());
     }
 
@@ -46,7 +51,7 @@ class PostsController extends Controller
     {
         //upload the image
         $image = $request->image->store('images/posts');
-        
+
 
         //create the post
         $post = Post::create([
@@ -66,7 +71,7 @@ class PostsController extends Controller
 
         //if post has tag, save it in the n to n table using attach
         //.. notice you submit more thang one tag at once through the array "tags"
-        
+
         if($request->tags){
             $post->tags()->attach($request->tags);
         }
@@ -94,6 +99,9 @@ class PostsController extends Controller
      */
     public function edit(Post $post)
     {
+        if(auth()->user()->id != $post->user_id && !auth()->user()->isAdmin()){
+            return redirect(route('home'))->with('error', 'you are not allowed to edit this post');
+        }
         return view('posts.create')->with(['post' => $post, 'categories' => Category::all(), 'tags' => Tag::all()]);
     }
 
@@ -106,7 +114,11 @@ class PostsController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //for security, so the hacker coudn't mass assign any other things: 
+        if(auth()->user()->id != $post->user_id && !auth()->user()->isAdmin()){
+            return redirect(route('home'))->with('error', 'you are not allowed to delete this post');
+        }
+
+        //for security, so the hacker coudn't mass assign any other things:
         $data = $request->only(['title','description','published_at','content', 'category_id']);
 
         //check if new image
@@ -117,9 +129,9 @@ class PostsController extends Controller
 
             //delete old one (I did the deletion code in the Post model)
             $post->deleteImage();
-            
 
-            //we add the image url to the array: 
+
+            //we add the image url to the array:
             $data['image'] = $image;
         }
 
@@ -153,11 +165,20 @@ class PostsController extends Controller
     //----------------------------------------------------------------------------
     public function destroy($id) // notice we didn't use (Post $post) cuz it won't get the trashed one
     {
+        
+        
+
         //get the post even if it's trashed:
         $post = Post::withTrashed()->where('id', $id)->firstOrFail(); //firstOrFail for security, so if it doesn't exist it should show 404 page
 
-        //if it's been soft deleted already, then delete it permanantly: 
-        if($post->trashed()){
+        if(auth()->user()->id != $post->user_id && !auth()->user()->isAdmin()){
+            return redirect(route('home'))->with('error', 'you are not allowed to delete this post');
+        }
+
+        //if it's been soft deleted already, then delete it permanantly:
+        if($post->trashed()){ // trashed() is a laravel function, if it's trash it reutrns true
+
+            
             $post->forceDelete();
 
             //delete image (I did the deletion code in the Post model)
@@ -180,7 +201,7 @@ class PostsController extends Controller
      */
 
     public function trashed(){
-        //this method get all the posts including the trashed posts: 
+        //this method get all the posts including the trashed posts:
         //$trashed = Post::withTrashed()->get();
         $trashed = Post::onlyTrashed()->get();
 
@@ -200,8 +221,8 @@ class PostsController extends Controller
 
         $trashed = Post::onlyTrashed()->get();
 
-        
-            
+
+
         //Wow, a very convenient way to redirect to the same page
         return redirect(route('trashed-posts.index'))->with('success','Post Restored Successfuly');
     }
